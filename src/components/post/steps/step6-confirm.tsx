@@ -28,7 +28,7 @@ export function Step6Confirm({ form, onSubmit, submitting, onBack }: Props) {
       <div style={{ background: 'var(--bg-base)', borderRadius: 'var(--radius-md)', padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
         <ConfirmRow label="撮影日" value={form.observedAt} />
         <ConfirmRow label="種名" value={form.speciesNameRaw || '（不明）'} />
-        {form.depthMin && <ConfirmRow label="水深" value={`${form.depthMin}${form.depthMax ? `〜${form.depthMax}` : ''}m`} />}
+        {form.depth && <ConfirmRow label="水深" value={`${form.depth}m`} />}
         {form.temperature && <ConfirmRow label="水温" value={`${form.temperature}℃`} />}
         {form.visibility && <ConfirmRow label="透明度" value={`${form.visibility}m`} />}
         {form.comment && <ConfirmRow label="コメント" value={form.comment} />}

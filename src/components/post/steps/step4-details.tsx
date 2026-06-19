@@ -5,127 +5,121 @@ import type { PostFormData } from '../post-wizard'
 type Props = { form: PostFormData; update: (p: Partial<PostFormData>) => void; onNext: () => void }
 
 const ABUNDANCE_OPTIONS = [
-  { value: 'single', label: '単独' },
-  { value: 'few', label: '数個体' },
-  { value: 'several', label: '数十個体' },
-  { value: 'many', label: '多数' },
-  { value: 'school', label: '群れ' },
+  { value: '1',   label: '１' },
+  { value: '少数', label: '少数' },
+  { value: '多数', label: '多数' },
+  { value: '大群', label: '大群' },
 ]
 
 export function Step4Details({ form, update, onNext }: Props) {
   return (
-    <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>観察詳細</h2>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>水中環境の情報を入力してください（すべて任意）</p>
-      </div>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <div style={{ flex: 1, padding: '24px 16px 16px', display: 'flex', flexDirection: 'column', gap: 22 }}>
+        {/* Step label */}
+        <div>
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: 'var(--fg-4)', letterSpacing: '0.1em', marginBottom: 4 }}>
+            STEP 4 / 6
+          </p>
+          <h2 style={{ fontSize: 20, fontWeight: 900, color: 'var(--fg)', letterSpacing: '-0.03em' }}>
+            観察詳細
+          </h2>
+          <p style={{ fontSize: 13, color: 'var(--fg-3)', marginTop: 4 }}>
+            水中環境の情報を入力してください（すべて任意）
+          </p>
+        </div>
 
-      {/* Depth */}
-      <div>
-        <label className="label">水深（m）</label>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          <input
-            type="number"
+        {/* Depth — single value */}
+        <div>
+          <label className="label">水深（m）</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <input
+              type="number"
+              className="input"
+              placeholder="例：18"
+              value={form.depth}
+              onChange={e => update({ depth: e.target.value })}
+              min={0}
+              max={100}
+              style={{ maxWidth: 140 }}
+            />
+            <span style={{ fontSize: 14, color: 'var(--fg-3)' }}>m</span>
+          </div>
+        </div>
+
+        {/* Temperature */}
+        <div>
+          <label className="label">水温（℃）</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <input
+              type="number"
+              className="input"
+              placeholder="例：22.5"
+              value={form.temperature}
+              onChange={e => update({ temperature: e.target.value })}
+              step={0.5}
+              min={0}
+              max={35}
+              style={{ maxWidth: 140 }}
+            />
+            <span style={{ fontSize: 14, color: 'var(--fg-3)' }}>℃</span>
+          </div>
+        </div>
+
+        {/* Visibility */}
+        <div>
+          <label className="label">透明度（m）</label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <input
+              type="number"
+              className="input"
+              placeholder="例：15"
+              value={form.visibility}
+              onChange={e => update({ visibility: e.target.value })}
+              min={0}
+              max={50}
+              style={{ maxWidth: 140 }}
+            />
+            <span style={{ fontSize: 14, color: 'var(--fg-3)' }}>m</span>
+          </div>
+        </div>
+
+        {/* Abundance — 4 options */}
+        <div>
+          <label className="label">個体数</label>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {ABUNDANCE_OPTIONS.map(opt => (
+              <button
+                key={opt.value}
+                className={`chip ${form.abundance === opt.value ? 'active' : ''}`}
+                style={{ flex: 1, justifyContent: 'center' }}
+                onClick={() => update({ abundance: form.abundance === opt.value ? '' : opt.value })}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Comment */}
+        <div>
+          <label className="label">コメント（任意）</label>
+          <textarea
             className="input"
-            placeholder="最浅"
-            value={form.depthMin}
-            onChange={e => update({ depthMin: e.target.value })}
-            min={0} max={100}
-            style={{ flex: 1 }}
-          />
-          <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>〜</span>
-          <input
-            type="number"
-            className="input"
-            placeholder="最深"
-            value={form.depthMax}
-            onChange={e => update({ depthMax: e.target.value })}
-            min={0} max={100}
-            style={{ flex: 1 }}
+            placeholder="行動の観察、特記事項など..."
+            value={form.comment}
+            onChange={e => update({ comment: e.target.value })}
+            rows={3}
+            style={{ resize: 'vertical' }}
           />
         </div>
       </div>
 
-      {/* Temperature */}
-      <div>
-        <label className="label">水温（℃）</label>
-        <input
-          type="number"
-          className="input"
-          placeholder="例：22.5"
-          value={form.temperature}
-          onChange={e => update({ temperature: e.target.value })}
-          step={0.5} min={0} max={35}
-        />
+      {/* Fixed bottom */}
+      <div style={{ padding: '12px 16px 20px', background: 'var(--bg-card)', borderTop: '1px solid var(--border-light)' }}>
+        <button className="btn btn-primary" style={{ width: '100%', fontSize: 15, padding: '14px' }} onClick={onNext}>
+          次へ →
+        </button>
       </div>
-
-      {/* Visibility */}
-      <div>
-        <label className="label">透明度（m）</label>
-        <input
-          type="number"
-          className="input"
-          placeholder="例：15"
-          value={form.visibility}
-          onChange={e => update({ visibility: e.target.value })}
-          min={0} max={50}
-        />
-      </div>
-
-      {/* Abundance */}
-      <div>
-        <label className="label">個体数</label>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-          {ABUNDANCE_OPTIONS.map(opt => (
-            <button
-              key={opt.value}
-              className={`chip ${form.abundance === opt.value ? 'active' : ''}`}
-              onClick={() => update({ abundance: form.abundance === opt.value ? '' : opt.value })}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Substrate */}
-      <div>
-        <label className="label">底質（任意）</label>
-        <input
-          className="input"
-          placeholder="例：砂地、岩礁、砂泥"
-          value={form.substrate}
-          onChange={e => update({ substrate: e.target.value })}
-        />
-      </div>
-
-      {/* Habitat */}
-      <div>
-        <label className="label">生息環境（任意）</label>
-        <input
-          className="input"
-          placeholder="例：珊瑚礁の隙間、海藻の下"
-          value={form.habitat}
-          onChange={e => update({ habitat: e.target.value })}
-        />
-      </div>
-
-      {/* Comment */}
-      <div>
-        <label className="label">コメント（任意）</label>
-        <textarea
-          className="input"
-          placeholder="行動の観察、特記事項など..."
-          value={form.comment}
-          onChange={e => update({ comment: e.target.value })}
-          rows={3}
-          style={{ resize: 'vertical' }}
-        />
-      </div>
-
-      <button className="btn btn-primary" style={{ width: '100%', marginTop: 8 }} onClick={onNext}>
-        次へ進む
-      </button>
     </div>
   )
 }
