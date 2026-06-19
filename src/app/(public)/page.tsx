@@ -6,7 +6,8 @@ import type { ObservationWithRelations, Area, Taxon, Shop } from '@/types/databa
 async function getHomeData() {
   const supabase = await createClient()
 
-  const [obsRes, areasRes, taxaRes, shopsRes, statsRes] = await Promise.all([
+  const [{ data: { user } }, obsRes, areasRes, taxaRes, shopsRes, statsRes] = await Promise.all([
+    supabase.auth.getUser(),
     supabase
       .from('observations')
       .select('*, profile:profiles(id,display_name), taxon:taxa(id,name_ja,name_scientific,colors), area:areas(id,name), point:points(id,name)')
@@ -24,6 +25,7 @@ async function getHomeData() {
   const totalSpecies = uniqueIds.size
 
   return {
+    user,
     observations: (obsRes.data ?? []) as ObservationWithRelations[],
     areas:        (areasRes.data ?? []) as Area[],
     taxa:         (taxaRes.data ?? []) as (Taxon & { group?: { name: string } | null })[],
@@ -34,7 +36,7 @@ async function getHomeData() {
 }
 
 export default async function HomePage() {
-  const { observations, areas, taxa, shops, totalPosts, totalSpecies } = await getHomeData()
+  const { user, observations, areas, taxa, shops, totalPosts, totalSpecies } = await getHomeData()
 
   const areaGradients = [
     { from: '#0d3a5a', to: '#1a6a8e', accent: '#4db8d8' },
@@ -51,9 +53,18 @@ export default async function HomePage() {
           <AnchorSvg />
           <span className="app-header-title">西伊豆 海中生物アーカイブ</span>
         </div>
-        <Link href="/auth/login" className="btn btn-outline-dark btn-sm" style={{ fontSize: 12, padding: '6px 14px' }}>
-          ログイン
-        </Link>
+        {user ? (
+          <Link href="/mypage" className="btn btn-outline-dark btn-sm" style={{ fontSize: 12, padding: '6px 14px', gap: 6 }}>
+            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+              <circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+            </svg>
+            マイページ
+          </Link>
+        ) : (
+          <Link href="/auth/login" className="btn btn-outline-dark btn-sm" style={{ fontSize: 12, padding: '6px 14px' }}>
+            ログイン
+          </Link>
+        )}
       </header>
 
       {/* ── Hero ── */}
