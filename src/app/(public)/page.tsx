@@ -379,9 +379,11 @@ export default async function HomePage() {
         <p style={{ fontSize: 13, color: 'rgba(180,216,232,0.75)', lineHeight: 1.9 }}>
           西伊豆 海中生物アーカイブは、ダイバーが日常的に撮影する水中写真を集め、西伊豆の海の生物多様性を継続的に記録・可視化する市民科学プロジェクトです。集まった写真はショップ・環境調査に活用されます。
         </p>
-        <Link href="/auth/signup" className="btn btn-sm" style={{ marginTop: 22, background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.18)', fontSize: 12 }}>
-          アカウントを作る（無料）
-        </Link>
+        {!user && (
+          <Link href="/auth/signup" className="btn btn-sm" style={{ marginTop: 22, background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)', border: '1px solid rgba(255,255,255,0.18)', fontSize: 12 }}>
+            アカウントを作る（無料）
+          </Link>
+        )}
       </section>
     </div>
   )
