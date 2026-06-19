@@ -35,7 +35,7 @@ export function Step3Point({ form, update, onNext }: Props) {
         {/* Step label */}
         <div>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: 'var(--fg-4)', letterSpacing: '0.1em', marginBottom: 4 }}>
-            STEP 3 / 6
+            STEP 3 / 5
           </p>
           <h2 style={{ fontSize: 20, fontWeight: 900, color: 'var(--fg)', letterSpacing: '-0.03em' }}>
             ポイント・場所

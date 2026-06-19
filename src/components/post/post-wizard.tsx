@@ -7,8 +7,7 @@ import { Step1Photo } from './steps/step1-photo'
 import { Step2Basic } from './steps/step2-basic'
 import { Step3Point } from './steps/step3-point'
 import { Step4Details } from './steps/step4-details'
-import { Step5Permissions } from './steps/step5-permissions'
-import { Step6Confirm } from './steps/step6-confirm'
+import { Step5Confirm } from './steps/step5-confirm'
 import { CheckIcon } from '@/components/ui/icons'
 
 export type PostFormData = {
@@ -26,10 +25,6 @@ export type PostFormData = {
   visibility: string
   abundance: string
   comment: string
-  permWebPublic: boolean
-  permPrUse: boolean
-  permResearchUse: boolean
-  creditType: 'handle' | 'real_name' | 'anonymous'
 }
 
 const INITIAL_FORM: PostFormData = {
@@ -47,11 +42,9 @@ const INITIAL_FORM: PostFormData = {
   visibility: '',
   abundance: '',
   comment: '',
-  permWebPublic: true,
-  permPrUse: false,
-  permResearchUse: false,
-  creditType: 'handle',
 }
+
+const TOTAL_STEPS = 5
 
 export function PostWizard() {
   const router = useRouter()
@@ -64,7 +57,7 @@ export function PostWizard() {
     setForm(prev => ({ ...prev, ...partial }))
   }, [])
 
-  const next = () => setStep(s => Math.min(s + 1, 6))
+  const next = () => setStep(s => Math.min(s + 1, TOTAL_STEPS))
   const back = () => setStep(s => Math.max(s - 1, 1))
 
   const submit = async () => {
@@ -104,13 +97,13 @@ export function PostWizard() {
         abundance: form.abundance || null,
         comment: form.comment || null,
         permissions: {
-          web_public: form.permWebPublic,
-          pr_use: form.permPrUse,
-          research_use: form.permResearchUse,
-          credit_type: form.creditType,
+          web_public: true,
+          pr_use: false,
+          research_use: false,
+          credit_type: 'handle',
         },
         status: form.speciesId ? 'poster_identified' : 'unconfirmed',
-        is_public: form.permWebPublic,
+        is_public: true,
       })
       if (insertError) throw insertError
 
@@ -165,7 +158,7 @@ export function PostWizard() {
           </button>
         </div>
         <div className="step-segments" style={{ marginBottom: 0 }}>
-          {Array.from({ length: 6 }).map((_, i) => (
+          {Array.from({ length: TOTAL_STEPS }).map((_, i) => (
             <div key={i} className={`step-segment ${i < step ? 'done' : ''}`} />
           ))}
         </div>
@@ -173,12 +166,11 @@ export function PostWizard() {
 
       {/* Step content */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
-        {step === 1 && <Step1Photo      form={form} update={update} onNext={next} />}
-        {step === 2 && <Step2Basic      form={form} update={update} onNext={next} />}
-        {step === 3 && <Step3Point      form={form} update={update} onNext={next} />}
-        {step === 4 && <Step4Details    form={form} update={update} onNext={next} />}
-        {step === 5 && <Step5Permissions form={form} update={update} onNext={next} />}
-        {step === 6 && <Step6Confirm    form={form} onSubmit={submit} submitting={submitting} onBack={back} />}
+        {step === 1 && <Step1Photo   form={form} update={update} onNext={next} />}
+        {step === 2 && <Step2Basic   form={form} update={update} onNext={next} />}
+        {step === 3 && <Step3Point   form={form} update={update} onNext={next} />}
+        {step === 4 && <Step4Details form={form} update={update} onNext={next} />}
+        {step === 5 && <Step5Confirm form={form} onSubmit={submit} submitting={submitting} onBack={back} />}
       </div>
     </div>
   )

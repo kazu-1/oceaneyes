@@ -9,12 +9,15 @@ type Props = {
   onBack: () => void
 }
 
-export function Step6Confirm({ form, onSubmit, submitting, onBack }: Props) {
+export function Step5Confirm({ form, onSubmit, submitting, onBack }: Props) {
   return (
     <div style={{ padding: 16, display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div>
-        <h2 style={{ fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', marginBottom: 4 }}>投稿内容の確認</h2>
-        <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>以下の内容で投稿します</p>
+        <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: 'var(--fg-4)', letterSpacing: '0.1em', marginBottom: 4 }}>
+          STEP 5 / 5
+        </p>
+        <h2 style={{ fontSize: 20, fontWeight: 900, color: 'var(--fg)', letterSpacing: '-0.03em' }}>投稿内容の確認</h2>
+        <p style={{ fontSize: 13, color: 'var(--fg-3)', marginTop: 4 }}>以下の内容で投稿します</p>
       </div>
 
       {/* Photo preview */}
@@ -31,15 +34,13 @@ export function Step6Confirm({ form, onSubmit, submitting, onBack }: Props) {
         {form.depth && <ConfirmRow label="水深" value={`${form.depth}m`} />}
         {form.temperature && <ConfirmRow label="水温" value={`${form.temperature}℃`} />}
         {form.visibility && <ConfirmRow label="透明度" value={`${form.visibility}m`} />}
+        {form.abundance && <ConfirmRow label="個体数" value={form.abundance} />}
         {form.comment && <ConfirmRow label="コメント" value={form.comment} />}
-        <ConfirmRow label="Web公開" value={form.permWebPublic ? 'する' : 'しない'} />
-        <ConfirmRow label="クレジット" value={{ handle: 'ハンドルネーム', real_name: '実名', anonymous: '匿名' }[form.creditType]} />
       </div>
 
       {/* Notice */}
       <div style={{ padding: 12, background: 'var(--status-new-bg)', borderRadius: 'var(--radius-md)', border: '1px solid var(--status-new)', fontSize: 12, color: 'var(--status-new)', lineHeight: 1.6 }}>
-        投稿後、ショップまたは専門家による種の同定が行われます。
-        同定結果はマイページで確認できます。
+        投稿後、ショップまたは専門家による種の同定が行われます。同定結果はマイページで確認できます。
       </div>
 
       <div style={{ display: 'flex', gap: 8 }}>
@@ -62,8 +63,8 @@ export function Step6Confirm({ form, onSubmit, submitting, onBack }: Props) {
 function ConfirmRow({ label, value }: { label: string; value: string }) {
   return (
     <div style={{ display: 'flex', gap: 8 }}>
-      <span style={{ fontSize: 12, color: 'var(--text-muted)', fontWeight: 600, minWidth: 80 }}>{label}</span>
-      <span style={{ fontSize: 13, color: 'var(--text-primary)' }}>{value}</span>
+      <span style={{ fontSize: 12, color: 'var(--fg-3)', fontWeight: 600, minWidth: 80 }}>{label}</span>
+      <span style={{ fontSize: 13, color: 'var(--fg)' }}>{value}</span>
     </div>
   )
 }

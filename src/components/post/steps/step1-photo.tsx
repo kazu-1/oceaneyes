@@ -19,7 +19,7 @@ export function Step1Photo({ form, update, onNext }: Props) {
         {/* Step label */}
         <div>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 600, color: 'var(--text-faint)', letterSpacing: '0.1em', marginBottom: 4 }}>
-            STEP 1 / 6
+            STEP 1 / 5
           </p>
           <h2 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
             写真を選ぶ
