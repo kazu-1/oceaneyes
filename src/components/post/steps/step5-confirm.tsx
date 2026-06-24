@@ -20,6 +20,13 @@ export function Step5Confirm({ form, onSubmit, submitting, onBack }: Props) {
         <p style={{ fontSize: 13, color: 'var(--fg-3)', marginTop: 4 }}>以下の内容で投稿します</p>
       </div>
 
+      {/* Title */}
+      {form.title && (
+        <p style={{ fontSize: 17, fontWeight: 800, color: 'var(--fg)', letterSpacing: '-0.02em', lineHeight: 1.4 }}>
+          {form.title}
+        </p>
+      )}
+
       {/* Photo preview */}
       {form.photoPreview && (
         <div style={{ borderRadius: 'var(--radius-md)', overflow: 'hidden', border: '1px solid var(--border-light)' }}>
@@ -29,7 +36,6 @@ export function Step5Confirm({ form, onSubmit, submitting, onBack }: Props) {
 
       {/* Summary */}
       <div style={{ background: 'var(--bg-base)', borderRadius: 'var(--radius-md)', padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {form.title && <ConfirmRow label="タイトル" value={form.title} />}
         <ConfirmRow label="撮影日" value={form.observedAt} />
         <ConfirmRow label="種名" value={form.speciesNameRaw || '（不明）'} />
         {form.shopNameFree && <ConfirmRow label="ショップ" value={form.shopNameFree} />}
@@ -37,11 +43,6 @@ export function Step5Confirm({ form, onSubmit, submitting, onBack }: Props) {
         {form.temperature && <ConfirmRow label="水温" value={`${form.temperature}℃`} />}
         {form.abundance && <ConfirmRow label="個体数" value={form.abundance} />}
         {form.comment && <ConfirmRow label="コメント" value={form.comment} />}
-      </div>
-
-      {/* Notice */}
-      <div style={{ padding: 12, background: 'var(--status-new-bg)', borderRadius: 'var(--radius-md)', border: '1px solid var(--status-new)', fontSize: 12, color: 'var(--status-new)', lineHeight: 1.6 }}>
-        投稿後、ショップまたは専門家による種の同定が行われます。同定結果はマイページで確認できます。
       </div>
 
       <div style={{ display: 'flex', gap: 8 }}>
