@@ -97,7 +97,7 @@ export function Step1Photo({ form, update, onNext }: Props) {
             <line x1="12" y1="8" x2="12.01" y2="8" />
           </svg>
           <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.65 }}>
-            生き物がはっきり写った写真を選んでください。撮影日や位置情報は写真から自動で読み取ります。
+            生き物がはっきり写った写真を選んでください。
           </p>
         </div>
       </div>

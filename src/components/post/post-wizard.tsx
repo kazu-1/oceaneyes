@@ -13,16 +13,17 @@ import { CheckIcon } from '@/components/ui/icons'
 export type PostFormData = {
   photoFile: File | null
   photoPreview: string | null
+  title: string
   observedAt: string
   areaId: string
   shopId: string
+  shopNameFree: string
   speciesNameRaw: string
   speciesId: string | null
   pointId: string | null
   mapCoords: { lat: number; lng: number } | null
   depth: string
   temperature: string
-  visibility: string
   abundance: string
   comment: string
 }
@@ -30,16 +31,17 @@ export type PostFormData = {
 const INITIAL_FORM: PostFormData = {
   photoFile: null,
   photoPreview: null,
+  title: '',
   observedAt: new Date().toISOString().slice(0, 10),
   areaId: '',
   shopId: '',
+  shopNameFree: '',
   speciesNameRaw: '',
   speciesId: null,
   pointId: null,
   mapCoords: null,
   depth: '',
   temperature: '',
-  visibility: '',
   abundance: '',
   comment: '',
 }
@@ -83,9 +85,11 @@ export function PostWizard() {
         user_id: user.id,
         photo_url: publicUrl,
         photo_path: path,
+        title: form.title || null,
         observed_at: form.observedAt,
         area_id: form.areaId || null,
         shop_id: form.shopId || null,
+        shop_name_free: form.shopNameFree || null,
         species_name_raw: form.speciesNameRaw || null,
         species_id: form.speciesId || null,
         point_id: form.pointId || null,
@@ -93,7 +97,6 @@ export function PostWizard() {
         depth_min: form.depth ? parseInt(form.depth) : null,
         depth_max: form.depth ? parseInt(form.depth) : null,
         temperature: form.temperature ? parseFloat(form.temperature) : null,
-        visibility: form.visibility ? parseInt(form.visibility) : null,
         abundance: form.abundance || null,
         comment: form.comment || null,
         permissions: {

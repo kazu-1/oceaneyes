@@ -29,11 +29,12 @@ export function Step5Confirm({ form, onSubmit, submitting, onBack }: Props) {
 
       {/* Summary */}
       <div style={{ background: 'var(--bg-base)', borderRadius: 'var(--radius-md)', padding: 14, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        {form.title && <ConfirmRow label="タイトル" value={form.title} />}
         <ConfirmRow label="撮影日" value={form.observedAt} />
         <ConfirmRow label="種名" value={form.speciesNameRaw || '（不明）'} />
+        {form.shopNameFree && <ConfirmRow label="ショップ" value={form.shopNameFree} />}
         {form.depth && <ConfirmRow label="水深" value={`${form.depth}m`} />}
         {form.temperature && <ConfirmRow label="水温" value={`${form.temperature}℃`} />}
-        {form.visibility && <ConfirmRow label="透明度" value={`${form.visibility}m`} />}
         {form.abundance && <ConfirmRow label="個体数" value={form.abundance} />}
         {form.comment && <ConfirmRow label="コメント" value={form.comment} />}
       </div>

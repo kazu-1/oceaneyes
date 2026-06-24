@@ -39,6 +39,18 @@ export function Step2Basic({ form, update, onNext }: Props) {
         <p style={{ fontSize: 13, color: 'var(--text-muted)' }}>撮影日、エリア、種名を入力してください</p>
       </div>
 
+      {/* Title */}
+      <div>
+        <label className="label">写真タイトル（任意）</label>
+        <input
+          className="input"
+          placeholder="例：カエルアンコウ発見！"
+          value={form.title}
+          onChange={e => update({ title: e.target.value })}
+          maxLength={80}
+        />
+      </div>
+
       {/* Date */}
       <div>
         <label className="label">撮影日 <span style={{ color: 'var(--accent-sun)' }}>*</span></label>
@@ -78,6 +90,20 @@ export function Step2Basic({ form, update, onNext }: Props) {
           </select>
         </div>
       )}
+
+      {/* Shop name free text */}
+      <div>
+        <label className="label">利用したダイビングショップ名（任意）</label>
+        <input
+          className="input"
+          placeholder="例：マリンスポーツ西伊豆"
+          value={form.shopNameFree}
+          onChange={e => update({ shopNameFree: e.target.value })}
+        />
+        <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4 }}>
+          リストにないショップの場合はこちらに入力してください
+        </p>
+      </div>
 
       {/* Species name with autocomplete */}
       <div style={{ position: 'relative' }}>

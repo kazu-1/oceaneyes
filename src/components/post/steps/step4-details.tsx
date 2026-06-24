@@ -65,24 +65,6 @@ export function Step4Details({ form, update, onNext }: Props) {
           </div>
         </div>
 
-        {/* Visibility */}
-        <div>
-          <label className="label">透明度（m）</label>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <input
-              type="number"
-              className="input"
-              placeholder="例：15"
-              value={form.visibility}
-              onChange={e => update({ visibility: e.target.value })}
-              min={0}
-              max={50}
-              style={{ maxWidth: 140 }}
-            />
-            <span style={{ fontSize: 14, color: 'var(--fg-3)' }}>m</span>
-          </div>
-        </div>
-
         {/* Abundance — 4 options */}
         <div>
           <label className="label">個体数</label>
