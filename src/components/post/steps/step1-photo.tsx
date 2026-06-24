@@ -97,7 +97,7 @@ export function Step1Photo({ form, update, onNext }: Props) {
             <line x1="12" y1="8" x2="12.01" y2="8" />
           </svg>
           <p style={{ fontSize: 12, color: 'var(--text-secondary)', lineHeight: 1.65 }}>
-            生き物がはっきり写った写真を選んでください。
+            生き物の全体がはっきり写った写真が高評価のポイントです！
           </p>
         </div>
       </div>
