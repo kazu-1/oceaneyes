@@ -142,17 +142,6 @@ export default async function ObservationDetailPage({ params }: { params: Promis
         </div>
       )}
 
-      {/* Permissions */}
-      {obs.permissions && (
-        <div style={{ padding: '0 16px 24px' }}>
-          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-muted)', marginBottom: 8 }}>利用許可</p>
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {obs.permissions.web_public && <span className="badge badge-confirm">Web公開</span>}
-            {obs.permissions.pr_use && <span className="badge badge-confirm">PR利用可</span>}
-            {obs.permissions.research_use && <span className="badge badge-confirm">研究利用可</span>}
-          </div>
-        </div>
-      )}
     </>
   )
 }

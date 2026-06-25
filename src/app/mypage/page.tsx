@@ -41,13 +41,9 @@ export default async function MyPage() {
   const observations = (obsRes.data ?? []) as ObservationWithRelations[]
   const groups       = (groupsRes.data ?? []) as { id: string; name: string }[]
 
-  const pending   = observations.filter(o => ['unconfirmed', 'unidentified', 'review', 'rejected'].includes(o.status))
   const confirmed = observations.filter(o => ['shop_confirmed', 'expert_confirmed', 'research_grade'].includes(o.status))
 
   const displayName = profile?.display_name ?? user.email?.split('@')[0] ?? 'ゲスト'
-
-  const areaNames = [...new Set(observations.slice(0, 10).map(o => o.area?.name).filter(Boolean))]
-  const activityArea = areaNames.slice(0, 2).join('・')
 
   type TaxonRow = { group_id?: string | null } & Record<string, unknown>
   const groupCounts: Record<string, number> = {}
@@ -84,9 +80,6 @@ export default async function MyPage() {
           <div style={{ flex: 1, minWidth: 0 }}>
             <p style={{ fontSize: 19, fontWeight: 900, color: '#fff', lineHeight: 1.2, letterSpacing: '-0.03em' }}>
               {displayName}
-            </p>
-            <p style={{ fontSize: 12, color: 'var(--ink-300)', marginTop: 4 }}>
-              {activityArea ? `${activityArea}エリアで活動中` : '西伊豆エリアで活動中'}
             </p>
           </div>
 
@@ -127,35 +120,6 @@ export default async function MyPage() {
         </Link>
       </div>
 
-      {/* ── PENDING ── */}
-      {pending.length > 0 && (
-        <section style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border-light)', paddingBottom: 16 }}>
-          <div className="section-header" style={{ paddingBottom: 10 }}>
-            <div>
-              <p className="section-label">PENDING</p>
-              <span className="section-title">同定待ち</span>
-            </div>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-4)' }}>{pending.length} 件</span>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 2, padding: '0 0' }}>
-            {pending.map(obs => {
-              const g = gradientFor(obs.id)
-              return (
-                <Link key={obs.id} href={`/observations/${obs.id}`} style={{ display: 'block', position: 'relative', aspectRatio: '1/1', overflow: 'hidden' }}>
-                  {obs.photo_url ? (
-                    <img src={obs.photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} loading="lazy" />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', background: `linear-gradient(145deg, ${g.from} 0%, ${g.to} 100%)` }} />
-                  )}
-                  {/* Status dot */}
-                  <div style={{ position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: '50%', background: 'var(--coral-500)', boxShadow: '0 0 0 2px rgba(255,255,255,0.9)' }} />
-                </Link>
-              )
-            })}
-          </div>
-        </section>
-      )}
-
       {/* ── 投稿写真一覧 (photo gallery) ── */}
       <section>
         <div className="section-header" style={{ paddingBottom: 10 }}>
@@ -180,7 +144,6 @@ export default async function MyPage() {
             {observations.map(obs => {
               const g = gradientFor(obs.id)
               const isConfirmed = ['shop_confirmed', 'expert_confirmed', 'research_grade'].includes(obs.status)
-              const isPending   = ['review', 'rejected'].includes(obs.status)
               return (
                 <Link
                   key={obs.id}
@@ -221,9 +184,6 @@ export default async function MyPage() {
                   {/* Status indicator dot */}
                   {isConfirmed && (
                     <div style={{ position: 'absolute', top: 5, right: 5, width: 7, height: 7, borderRadius: '50%', background: 'var(--status-expert)', boxShadow: '0 0 0 1.5px rgba(255,255,255,0.9)' }} />
-                  )}
-                  {isPending && (
-                    <div style={{ position: 'absolute', top: 5, right: 5, width: 7, height: 7, borderRadius: '50%', background: 'var(--coral-500)', boxShadow: '0 0 0 1.5px rgba(255,255,255,0.9)' }} />
                   )}
                 </Link>
               )
