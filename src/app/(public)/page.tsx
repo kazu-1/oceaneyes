@@ -151,33 +151,7 @@ export default async function HomePage() {
 
       {/* ── HOW IT WORKS — horizontal scroll cards ── */}
       <section style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border-light)', paddingBottom: 24 }}>
-
-        {/* Photo strip */}
-        <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/nishiizu-hero.jpg"
-            alt="西伊豆の海"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 68%' }}
-          />
-          <div style={{
-            position: 'absolute', inset: 0,
-            background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.48) 100%)',
-          }} />
-          <div style={{ position: 'absolute', bottom: 16, left: 20, right: 20 }}>
-            <p style={{
-              fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600,
-              color: 'rgba(255,255,255,0.7)', letterSpacing: '0.14em', marginBottom: 4,
-            }}>
-              NISHIIZU, SHIZUOKA
-            </p>
-            <p style={{ fontSize: 15, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', textShadow: '0 1px 8px rgba(0,0,0,0.4)' }}>
-              透明度抜群の海で、生き物に出会う。
-            </p>
-          </div>
-        </div>
-
-        <div style={{ padding: '24px 20px 0' }}>
+        <div style={{ padding: '28px 20px 0' }}>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, color: 'var(--ink-500)', letterSpacing: '0.14em', marginBottom: 4 }}>
             HOW IT WORKS
           </p>
@@ -186,53 +160,74 @@ export default async function HomePage() {
           </h2>
         </div>
 
-        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '4px 20px 4px', scrollbarWidth: 'none' as const }}>
+        <div style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '4px 20px 16px', scrollbarWidth: 'none' as const }}>
           {/* Card 1 */}
           <div style={{
-            flexShrink: 0, width: 192, borderRadius: 'var(--r-xl)',
-            background: 'linear-gradient(145deg, var(--ink-800) 0%, var(--ink-950) 100%)',
-            padding: '22px 18px 20px', boxShadow: 'var(--sh-md)',
+            flexShrink: 0, width: 200, borderRadius: 'var(--r-xl)',
+            background: 'var(--ink-950)',
+            overflow: 'hidden', boxShadow: 'var(--sh-md)',
           }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700, color: 'var(--ink-300)', letterSpacing: '0.1em' }}>01</span>
-            <div style={{ margin: '14px 0 12px', width: 40, height: 40, borderRadius: 'var(--r-md)', background: 'rgba(77,154,184,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="var(--ink-300)" strokeWidth={1.8} strokeLinecap="round">
-                <path d="M12 22V12M12 12l-4 4M12 12l4 4" /><path d="M5 8a7 7 0 0114 0" /><circle cx="12" cy="5" r="2" />
-              </svg>
+            <div style={{ height: 120, position: 'relative', overflow: 'hidden' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/nishiizu-hero.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(4,14,28,0.1) 30%, rgba(4,14,28,0.85) 100%)' }} />
+              <span style={{ position: 'absolute', bottom: 12, left: 18, fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700, color: 'var(--ink-300)', letterSpacing: '0.1em' }}>01</span>
             </div>
-            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginBottom: 6, letterSpacing: '-0.02em' }}>潜って、撮る</h3>
-            <p style={{ fontSize: 12, color: 'rgba(180,216,232,0.7)', lineHeight: 1.65 }}>ダイビングで出会った生き物を撮影。難しい設定は不要。</p>
+            <div style={{ padding: '14px 18px 20px' }}>
+              <div style={{ marginBottom: 10, width: 36, height: 36, borderRadius: 'var(--r-md)', background: 'rgba(77,154,184,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="var(--ink-300)" strokeWidth={1.8} strokeLinecap="round">
+                  <path d="M12 22V12M12 12l-4 4M12 12l4 4" /><path d="M5 8a7 7 0 0114 0" /><circle cx="12" cy="5" r="2" />
+                </svg>
+              </div>
+              <h3 style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginBottom: 6, letterSpacing: '-0.02em' }}>潜って、撮る</h3>
+              <p style={{ fontSize: 12, color: 'rgba(180,216,232,0.7)', lineHeight: 1.65 }}>ダイビングで出会った生き物を撮影。難しい設定は不要。</p>
+            </div>
           </div>
 
           {/* Card 2 */}
           <div style={{
-            flexShrink: 0, width: 192, borderRadius: 'var(--r-xl)',
-            background: 'linear-gradient(145deg, #5a2208 0%, #c05020 100%)',
-            padding: '22px 18px 20px', boxShadow: 'var(--sh-md)',
+            flexShrink: 0, width: 200, borderRadius: 'var(--r-xl)',
+            background: '#3a1204',
+            overflow: 'hidden', boxShadow: 'var(--sh-md)',
           }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700, color: 'rgba(240,160,100,0.8)', letterSpacing: '0.1em' }}>02</span>
-            <div style={{ margin: '14px 0 12px', width: 40, height: 40, borderRadius: 'var(--r-md)', background: 'rgba(232,113,74,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="rgba(240,160,100,0.9)" strokeWidth={1.8} strokeLinecap="round">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
-              </svg>
+            <div style={{ height: 120, position: 'relative', overflow: 'hidden' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/nishiizu-hero.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '60% 75%' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(90,34,8,0.1) 30%, rgba(90,34,8,0.85) 100%)' }} />
+              <span style={{ position: 'absolute', bottom: 12, left: 18, fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700, color: 'rgba(240,160,100,0.9)', letterSpacing: '0.1em' }}>02</span>
             </div>
-            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginBottom: 6, letterSpacing: '-0.02em' }}>3分で投稿</h3>
-            <p style={{ fontSize: 12, color: 'rgba(240,200,170,0.75)', lineHeight: 1.65 }}>エリアと生き物の名前を選ぶだけ。わからなくてOK。</p>
+            <div style={{ padding: '14px 18px 20px' }}>
+              <div style={{ marginBottom: 10, width: 36, height: 36, borderRadius: 'var(--r-md)', background: 'rgba(232,113,74,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="rgba(240,160,100,0.9)" strokeWidth={1.8} strokeLinecap="round">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" /><polyline points="17 8 12 3 7 8" /><line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+              </div>
+              <h3 style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginBottom: 6, letterSpacing: '-0.02em' }}>3分で投稿</h3>
+              <p style={{ fontSize: 12, color: 'rgba(240,200,170,0.75)', lineHeight: 1.65 }}>エリアと生き物の名前を選ぶだけ。わからなくてOK。</p>
+            </div>
           </div>
 
           {/* Card 3 */}
           <div style={{
-            flexShrink: 0, width: 192, borderRadius: 'var(--r-xl)',
-            background: 'linear-gradient(145deg, #0a3828 0%, #186040 100%)',
-            padding: '22px 18px 20px', boxShadow: 'var(--sh-md)',
+            flexShrink: 0, width: 200, borderRadius: 'var(--r-xl)',
+            background: '#051e14',
+            overflow: 'hidden', boxShadow: 'var(--sh-md)',
           }}>
-            <span style={{ fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700, color: 'rgba(80,200,140,0.8)', letterSpacing: '0.1em' }}>03</span>
-            <div style={{ margin: '14px 0 12px', width: 40, height: 40, borderRadius: 'var(--r-md)', background: 'rgba(64,192,128,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="rgba(80,200,140,0.9)" strokeWidth={1.8} strokeLinecap="round">
-                <path d="M2 12s3-6 10-6 10 6 10 6-3 6-10 6-10-6-10-6z" /><circle cx="12" cy="12" r="3" />
-              </svg>
+            <div style={{ height: 120, position: 'relative', overflow: 'hidden' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/nishiizu-hero.jpg" alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: '30% 90%' }} />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(5,30,20,0.1) 30%, rgba(5,30,20,0.85) 100%)' }} />
+              <span style={{ position: 'absolute', bottom: 12, left: 18, fontFamily: 'var(--font-mono)', fontSize: 11, fontWeight: 700, color: 'rgba(80,200,140,0.9)', letterSpacing: '0.1em' }}>03</span>
             </div>
-            <h3 style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginBottom: 6, letterSpacing: '-0.02em' }}>海の記録になる</h3>
-            <p style={{ fontSize: 12, color: 'rgba(160,220,190,0.7)', lineHeight: 1.65 }}>専門家が同定。西伊豆の図鑑に永続記録されます。</p>
+            <div style={{ padding: '14px 18px 20px' }}>
+              <div style={{ marginBottom: 10, width: 36, height: 36, borderRadius: 'var(--r-md)', background: 'rgba(64,192,128,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="rgba(80,200,140,0.9)" strokeWidth={1.8} strokeLinecap="round">
+                  <path d="M2 12s3-6 10-6 10 6 10 6-3 6-10 6-10-6-10-6z" /><circle cx="12" cy="12" r="3" />
+                </svg>
+              </div>
+              <h3 style={{ fontSize: 15, fontWeight: 800, color: '#fff', marginBottom: 6, letterSpacing: '-0.02em' }}>海の記録になる</h3>
+              <p style={{ fontSize: 12, color: 'rgba(160,220,190,0.7)', lineHeight: 1.65 }}>専門家が同定。西伊豆の図鑑に永続記録されます。</p>
+            </div>
           </div>
         </div>
       </section>
