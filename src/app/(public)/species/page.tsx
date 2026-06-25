@@ -134,6 +134,7 @@ export default function SpeciesPage() {
         lng:         o.map_coords!.lng,
         speciesName: o.taxon?.name_ja ?? o.species_name_raw!,
         photoUrl:    o.photo_url ?? null,
+        groupName:   o.taxon?.group?.name ?? null,
       }))
   }, [rawObs, filtered])
 

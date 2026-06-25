@@ -7,6 +7,7 @@ export type ObsMarker = {
   lng: number
   speciesName: string
   photoUrl: string | null
+  groupName: string | null
 }
 
 type Props = {
@@ -15,6 +16,42 @@ type Props = {
 }
 
 const NISHIIZU_CENTER = { lat: 34.775, lng: 138.748 }
+
+const GROUP_PIN: Record<string, { color: string; emoji: string }> = {
+  '魚類':       { color: '#1a7090', emoji: '🐟' },
+  'ウミウシ':   { color: '#c05830', emoji: '🐙' },
+  '甲殻類':    { color: '#906020', emoji: '🦀' },
+  '頭足類':    { color: '#2a6080', emoji: '🦑' },
+  '海藻・海草': { color: '#1a6038', emoji: '🌿' },
+  'その他':    { color: '#4a4a6a', emoji: '🐚' },
+}
+const DEFAULT_PIN = { color: '#888888', emoji: '❓' }
+
+function pinHtml(groupName: string | null): string {
+  const { color, emoji } = (groupName ? GROUP_PIN[groupName] : null) ?? DEFAULT_PIN
+  return `
+    <div style="
+      position:relative;
+      width:38px;height:38px;
+      border-radius:50%;
+      background:${color};
+      border:3px solid rgba(255,255,255,0.95);
+      box-shadow:0 3px 12px rgba(0,0,0,0.35);
+      display:flex;align-items:center;justify-content:center;
+      font-size:18px;line-height:1;
+    ">
+      ${emoji}
+      <div style="
+        position:absolute;bottom:-9px;left:50%;
+        transform:translateX(-50%);
+        width:0;height:0;
+        border-left:7px solid transparent;
+        border-right:7px solid transparent;
+        border-top:10px solid ${color};
+      "></div>
+    </div>
+  `
+}
 
 export function SpeciesMap({ markers, height = 480 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -28,11 +65,6 @@ export function SpeciesMap({ markers, height = 480 }: Props) {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       delete (L.Icon.Default.prototype as any)._getIconUrl
-      L.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-        iconUrl:       'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-        shadowUrl:     'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-      })
 
       const map = L.map(containerRef.current!, {
         center: [NISHIIZU_CENTER.lat, NISHIIZU_CENTER.lng],
@@ -47,16 +79,9 @@ export function SpeciesMap({ markers, height = 480 }: Props) {
 
       for (const m of markers) {
         const icon = L.divIcon({
-          html: `<div style="
-            width:16px;height:22px;
-            background:#e8714a;
-            border-radius:50% 50% 50% 0;
-            transform:rotate(-45deg);
-            border:2px solid #fff;
-            box-shadow:0 2px 8px rgba(0,0,0,0.3);
-          "></div>`,
-          iconSize:   [16, 22],
-          iconAnchor: [8, 22],
+          html:       pinHtml(m.groupName),
+          iconSize:   [38, 48],
+          iconAnchor: [19, 48],
           className:  '',
         })
 
@@ -64,7 +89,7 @@ export function SpeciesMap({ markers, height = 480 }: Props) {
           ? `<img src="${m.photoUrl}" style="width:100%;height:80px;object-fit:cover;border-radius:6px;margin-top:6px;display:block;">`
           : ''
 
-        const popup = L.popup({ maxWidth: 180, className: 'obs-popup' }).setContent(`
+        const popup = L.popup({ maxWidth: 180 }).setContent(`
           <div style="font-size:13px;font-weight:800;color:#0d2d42;line-height:1.3;">${m.speciesName}</div>
           ${photoHtml}
         `)
@@ -77,7 +102,7 @@ export function SpeciesMap({ markers, height = 480 }: Props) {
           const bounds = L.latLngBounds(markers.map(m => [m.lat, m.lng] as [number, number]))
           map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 })
         } catch {
-          // markers might all be same point
+          // all markers at same point
         }
       }
 
@@ -90,7 +115,6 @@ export function SpeciesMap({ markers, height = 480 }: Props) {
       mapRef.current?.remove()
       mapRef.current = null
     }
-  // markers changes are handled by key on parent — no dep needed here
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
