@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import type { TaxonWithGroup, Group } from '@/types/database'
+import type { Group } from '@/types/database'
 
 const GROUP_COLORS: Record<string, { from: string; to: string }> = {
   '魚類':       { from: '#0e3e5a', to: '#1a7090' },
@@ -12,41 +12,83 @@ const GROUP_COLORS: Record<string, { from: string; to: string }> = {
   '頭足類':    { from: '#1a3050', to: '#2a6080' },
   '海藻・海草': { from: '#0a3020', to: '#1a6038' },
   'その他':    { from: '#2a2a3a', to: '#4a4a6a' },
+  '未同定':    { from: '#3a3a3a', to: '#6a6a6a' },
 }
 const DEFAULT_COLORS = { from: '#0d2d42', to: '#164560' }
 
+type SpeciesEntry = {
+  key: string
+  displayName: string
+  scientificName: string | null
+  groupId: string | null
+  groupName: string | null
+  speciesId: string | null
+  count: number
+  photoUrl: string | null
+}
+
+const UNIDENTIFIED_GROUP_ID = '__unidentified__'
+
 export default function SpeciesPage() {
-  const [taxa, setTaxa]                   = useState<TaxonWithGroup[]>([])
+  const [entries, setEntries]             = useState<SpeciesEntry[]>([])
   const [groups, setGroups]               = useState<Group[]>([])
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
   const [search, setSearch]               = useState('')
   const [loading, setLoading]             = useState(true)
-  const [totalCount, setTotalCount]       = useState(0)
 
   useEffect(() => {
     const supabase = createClient()
     supabase.from('groups').select('*').order('sort_order').then(({ data }) => setGroups(data ?? []))
-    supabase.from('taxa').select('id', { count: 'exact', head: true }).then(({ count }) => setTotalCount(count ?? 0))
+
+    supabase
+      .from('observations')
+      .select('species_name_raw, species_id, photo_url, taxon:taxa(id, name_ja, name_scientific, group_id, group:groups(id, name))')
+      .eq('is_public', true)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .then(({ data }: { data: any[] | null }) => {
+        const map = new Map<string, SpeciesEntry>()
+        for (const o of data ?? []) {
+          const rawName = o.species_name_raw as string | null
+          if (!rawName) continue
+          const key = rawName
+          if (!map.has(key)) {
+            const taxon = o.taxon
+            map.set(key, {
+              key,
+              displayName: taxon?.name_ja ?? rawName,
+              scientificName: taxon?.name_scientific ?? null,
+              groupId: taxon?.group_id ?? UNIDENTIFIED_GROUP_ID,
+              groupName: taxon?.group?.name ?? '未同定',
+              speciesId: o.species_id ?? null,
+              count: 0,
+              photoUrl: o.photo_url ?? null,
+            })
+          }
+          const entry = map.get(key)!
+          entry.count++
+          if (!entry.photoUrl && o.photo_url) entry.photoUrl = o.photo_url
+        }
+        setEntries(Array.from(map.values()).sort((a, b) => b.count - a.count))
+        setLoading(false)
+      })
   }, [])
 
-  useEffect(() => {
-    setLoading(true)
-    const supabase = createClient()
-    let q = supabase.from('taxa').select('*, group:groups(*)').order('record_count', { ascending: false })
-    if (selectedGroup) q = q.eq('group_id', selectedGroup)
-    q.then(({ data }) => {
-      let results = (data ?? []) as TaxonWithGroup[]
-      if (search.trim()) {
-        const s = search.toLowerCase()
-        results = results.filter(t =>
-          t.name_ja.toLowerCase().includes(s) ||
-          (t.name_scientific ?? '').toLowerCase().includes(s)
-        )
-      }
-      setTaxa(results)
-      setLoading(false)
-    })
-  }, [selectedGroup, search])
+  const filtered = useMemo(() => {
+    let result = entries
+    if (selectedGroup) {
+      result = result.filter(e => e.groupId === selectedGroup)
+    }
+    if (search.trim()) {
+      const s = search.toLowerCase()
+      result = result.filter(e =>
+        e.displayName.toLowerCase().includes(s) ||
+        (e.scientificName ?? '').toLowerCase().includes(s)
+      )
+    }
+    return result
+  }, [entries, selectedGroup, search])
+
+  const hasUnidentified = entries.some(e => e.groupId === UNIDENTIFIED_GROUP_ID)
 
   return (
     <>
@@ -55,7 +97,7 @@ export default function SpeciesPage() {
         <p className="field-guide-label">FIELD GUIDE</p>
         <h1 className="field-guide-title">西伊豆 海中生物図鑑</h1>
         <p className="field-guide-sub">
-          みんなの投稿から作られる海の図鑑。{totalCount > 0 ? `${totalCount} 種を記録中。` : ''}
+          みんなの投稿から作られる海の図鑑。{entries.length > 0 ? `${entries.length} 種を記録中。` : ''}
         </p>
 
         {/* Search */}
@@ -103,6 +145,14 @@ export default function SpeciesPage() {
             {g.name}
           </button>
         ))}
+        {hasUnidentified && (
+          <button
+            className={`chip ${selectedGroup === UNIDENTIFIED_GROUP_ID ? 'active' : ''}`}
+            onClick={() => setSelectedGroup(UNIDENTIFIED_GROUP_ID)}
+          >
+            未同定
+          </button>
+        )}
       </div>
 
       {/* ── Grid ── */}
@@ -111,7 +161,7 @@ export default function SpeciesPage() {
           Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="skeleton" style={{ aspectRatio: '3/4', borderRadius: 'var(--r-lg)' }} />
           ))
-        ) : taxa.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <div className="empty-state" style={{ gridColumn: '1/-1' }}>
             <svg width={40} height={40} viewBox="0 0 24 24" fill="none" stroke="var(--fg-4)" strokeWidth={1.2} strokeLinecap="round">
               <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -119,66 +169,72 @@ export default function SpeciesPage() {
             <p style={{ fontSize: 13 }}>該当する種が見つかりません</p>
           </div>
         ) : (
-          taxa.map(taxon => {
-            const groupName = taxon.group?.name ?? ''
-            const gc = GROUP_COLORS[groupName] ?? DEFAULT_COLORS
+          filtered.map(entry => {
+            const gc = GROUP_COLORS[entry.groupName ?? ''] ?? DEFAULT_COLORS
+            const isUnidentified = entry.groupId === UNIDENTIFIED_GROUP_ID
+            const href = entry.speciesId ? `/species/${entry.speciesId}` : `/gallery?q=${encodeURIComponent(entry.key)}`
             return (
-              <Link key={taxon.id} href={`/species/${taxon.id}`} className="species-grid-card">
+              <Link key={entry.key} href={href} className="species-grid-card">
                 {/* Photo area */}
                 <div style={{ width: '100%', aspectRatio: '1/1', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{
-                    width: '100%', height: '100%',
-                    background: `linear-gradient(155deg, ${gc.from} 0%, ${gc.to} 100%)`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    position: 'relative',
-                  }}>
-                    {/* Light shimmer */}
-                    <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 25% 25%, rgba(255,255,255,0.12) 0%, transparent 60%)' }} />
-                    {/* Caustic glow */}
-                    <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 75% 80%, rgba(232,113,74,0.12) 0%, transparent 50%)' }} />
-                    {/* Icon */}
+                  {entry.photoUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={entry.photoUrl}
+                      alt={entry.displayName}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  ) : (
                     <div style={{
-                      width: 48, height: 48, borderRadius: '50%',
-                      background: 'rgba(255,255,255,0.08)',
-                      border: '1.5px solid rgba(255,255,255,0.16)',
+                      width: '100%', height: '100%',
+                      background: `linear-gradient(155deg, ${gc.from} 0%, ${gc.to} 100%)`,
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      position: 'relative', zIndex: 1,
+                      position: 'relative',
                     }}>
-                      <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth={1.4} strokeLinecap="round">
-                        <path d="M6.5 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6" />
-                        <path d="M2 12l4-4v8L2 12z" />
-                      </svg>
-                    </div>
-                    {/* Category badge */}
-                    {groupName && (
-                      <div style={{ position: 'absolute', bottom: 8, left: 8 }}>
-                        <span style={{
-                          display: 'inline-flex', alignItems: 'center',
-                          padding: '3px 9px', borderRadius: 'var(--r-full)',
-                          fontSize: 10, fontWeight: 700,
-                          background: 'rgba(0,0,0,0.42)', color: 'rgba(255,255,255,0.9)',
-                          backdropFilter: 'blur(8px)',
-                          letterSpacing: '0.01em',
-                        }}>
-                          {groupName}
-                        </span>
+                      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 25% 25%, rgba(255,255,255,0.12) 0%, transparent 60%)' }} />
+                      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 75% 80%, rgba(232,113,74,0.12) 0%, transparent 50%)' }} />
+                      <div style={{
+                        width: 48, height: 48, borderRadius: '50%',
+                        background: 'rgba(255,255,255,0.08)',
+                        border: '1.5px solid rgba(255,255,255,0.16)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        position: 'relative', zIndex: 1,
+                      }}>
+                        <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth={1.4} strokeLinecap="round">
+                          <path d="M6.5 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6" />
+                          <path d="M2 12l4-4v8L2 12z" />
+                        </svg>
                       </div>
-                    )}
+                    </div>
+                  )}
+                  {/* Badge */}
+                  <div style={{ position: 'absolute', bottom: 8, left: 8 }}>
+                    <span style={{
+                      display: 'inline-flex', alignItems: 'center',
+                      padding: '3px 9px', borderRadius: 'var(--r-full)',
+                      fontSize: 10, fontWeight: 700,
+                      background: isUnidentified ? 'rgba(180,100,40,0.7)' : 'rgba(0,0,0,0.42)',
+                      color: 'rgba(255,255,255,0.9)',
+                      backdropFilter: 'blur(8px)',
+                      letterSpacing: '0.01em',
+                    }}>
+                      {isUnidentified ? '未同定' : entry.groupName}
+                    </span>
                   </div>
                 </div>
 
                 {/* Info */}
                 <div style={{ padding: '10px 12px 13px' }}>
                   <p style={{ fontSize: 13, fontWeight: 800, color: 'var(--fg)', lineHeight: 1.25, marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', letterSpacing: '-0.02em' }}>
-                    {taxon.name_ja}
+                    {entry.displayName}
                   </p>
-                  {taxon.name_scientific && (
+                  {entry.scientificName && (
                     <p style={{ fontSize: 10, color: 'var(--fg-4)', fontStyle: 'italic', fontFamily: 'var(--font-mono)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: 4 }}>
-                      {taxon.name_scientific}
+                      {entry.scientificName}
                     </p>
                   )}
                   <p style={{ fontSize: 10, color: 'var(--fg-3)' }}>
-                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--ink-500)', fontSize: 12 }}>{taxon.record_count}</span>{' '}件の記録
+                    <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--ink-500)', fontSize: 12 }}>{entry.count}</span>{' '}件の記録
                   </p>
                 </div>
               </Link>

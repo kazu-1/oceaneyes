@@ -6,8 +6,16 @@ import type { Area } from '@/types/database'
 
 export default async function AreasPage() {
   const supabase = await createClient()
-  const { data } = await supabase.from('areas').select('*').order('name')
-  const areas = (data ?? []) as Area[]
+  const [{ data: areasData }, { data: obsData }] = await Promise.all([
+    supabase.from('areas').select('*').order('name'),
+    supabase.from('observations').select('area_id, species_name_raw').eq('is_public', true),
+  ])
+
+  const areas = (areasData ?? []).map(area => {
+    const areaObs = (obsData ?? []).filter((o: { area_id: string | null; species_name_raw: string | null }) => o.area_id === area.id)
+    const uniqueSpecies = new Set(areaObs.map(o => o.species_name_raw).filter(Boolean))
+    return { ...(area as Area), live_post_count: areaObs.length, live_species_count: uniqueSpecies.size }
+  })
 
   return (
     <>
@@ -48,10 +56,10 @@ export default async function AreasPage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', gap: 16 }}>
                 <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                  <span style={{ fontWeight: 800, color: 'var(--ocean-dark)', fontFamily: 'var(--font-mono)' }}>{area.species_count}</span> 種
+                  <span style={{ fontWeight: 800, color: 'var(--ocean-dark)', fontFamily: 'var(--font-mono)' }}>{area.live_species_count}</span> 種
                 </span>
                 <span style={{ fontSize: 12, color: 'var(--text-muted)' }}>
-                  <span style={{ fontWeight: 800, color: 'var(--ocean-dark)', fontFamily: 'var(--font-mono)' }}>{area.post_count}</span> 記録
+                  <span style={{ fontWeight: 800, color: 'var(--ocean-dark)', fontFamily: 'var(--font-mono)' }}>{area.live_post_count}</span> 記録
                 </span>
               </div>
               <span style={{ display: 'flex', alignItems: 'center', gap: 3, fontSize: 12, color: 'var(--ocean-dark)', fontWeight: 600 }}>
