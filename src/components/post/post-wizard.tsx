@@ -18,6 +18,7 @@ export type PostFormData = {
   areaId: string
   shopId: string
   shopNameFree: string
+  groupId: string
   speciesNameRaw: string
   speciesId: string | null
   pointId: string | null
@@ -36,6 +37,7 @@ const INITIAL_FORM: PostFormData = {
   areaId: '',
   shopId: '',
   shopNameFree: '',
+  groupId: '',
   speciesNameRaw: '',
   speciesId: null,
   pointId: null,
@@ -90,6 +92,7 @@ export function PostWizard() {
         area_id: form.areaId || null,
         shop_id: form.shopId || null,
         shop_name_free: form.shopNameFree || null,
+        group_id: form.groupId || null,
         species_name_raw: form.speciesNameRaw || null,
         species_id: form.speciesId || null,
         point_id: form.pointId || null,

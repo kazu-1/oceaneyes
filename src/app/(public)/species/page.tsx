@@ -19,7 +19,6 @@ const GROUP_COLORS: Record<string, { from: string; to: string }> = {
   '頭足類':    { from: '#1a3050', to: '#2a6080' },
   '海藻・海草': { from: '#0a3020', to: '#1a6038' },
   'その他':    { from: '#2a2a3a', to: '#4a4a6a' },
-  '未同定':    { from: '#3a3a3a', to: '#6a6a6a' },
 }
 const DEFAULT_COLORS = { from: '#0d2d42', to: '#164560' }
 
@@ -40,6 +39,8 @@ type RawObs = {
   photo_url: string | null
   map_coords: { lat: number; lng: number } | null
   area_id: string | null
+  group_id: string | null
+  obs_group: { id: string; name: string } | null
   taxon: {
     id: string
     name_ja: string
@@ -48,8 +49,6 @@ type RawObs = {
     group: { id: string; name: string } | null
   } | null
 }
-
-const UNIDENTIFIED_GROUP_ID = '__unidentified__'
 
 export default function SpeciesPage() {
   const [entries, setEntries]             = useState<SpeciesEntry[]>([])
@@ -69,7 +68,7 @@ export default function SpeciesPage() {
 
     supabase
       .from('observations')
-      .select('species_name_raw, species_id, photo_url, map_coords, area_id, taxon:taxa(id, name_ja, name_scientific, group_id, group:groups(id, name))')
+      .select('species_name_raw, species_id, photo_url, map_coords, area_id, group_id, obs_group:groups(id, name), taxon:taxa(id, name_ja, name_scientific, group_id, group:groups(id, name))')
       .eq('is_public', true)
       .then(({ data }) => {
         const obs = (data ?? []) as unknown as RawObs[]
@@ -86,8 +85,8 @@ export default function SpeciesPage() {
               key,
               displayName:    taxon?.name_ja ?? rawName,
               scientificName: taxon?.name_scientific ?? null,
-              groupId:        taxon?.group_id ?? UNIDENTIFIED_GROUP_ID,
-              groupName:      taxon?.group?.name ?? '未同定',
+              groupId:        taxon?.group_id ?? o.group_id ?? null,
+              groupName:      taxon?.group?.name ?? o.obs_group?.name ?? null,
               speciesId:      o.species_id ?? null,
               count:          0,
               photoUrl:       o.photo_url ?? null,
@@ -134,11 +133,9 @@ export default function SpeciesPage() {
         lng:         o.map_coords!.lng,
         speciesName: o.taxon?.name_ja ?? o.species_name_raw!,
         photoUrl:    o.photo_url ?? null,
-        groupName:   o.taxon?.group?.name ?? null,
+        groupName:   o.taxon?.group?.name ?? o.obs_group?.name ?? null,
       }))
   }, [rawObs, filtered])
-
-  const hasUnidentified = entries.some(e => e.groupId === UNIDENTIFIED_GROUP_ID)
 
   return (
     <>
@@ -213,14 +210,6 @@ export default function SpeciesPage() {
             {g.name}
           </button>
         ))}
-        {hasUnidentified && (
-          <button
-            className={`chip ${selectedGroup === UNIDENTIFIED_GROUP_ID ? 'active' : ''}`}
-            onClick={() => setSelectedGroup(UNIDENTIFIED_GROUP_ID)}
-          >
-            未同定
-          </button>
-        )}
       </div>
 
       {/* ── Map view ── */}
@@ -260,7 +249,6 @@ export default function SpeciesPage() {
           ) : (
             filtered.map(entry => {
               const gc = GROUP_COLORS[entry.groupName ?? ''] ?? DEFAULT_COLORS
-              const isUnidentified = entry.groupId === UNIDENTIFIED_GROUP_ID
               const href = entry.speciesId ? `/species/${entry.speciesId}` : `/gallery?q=${encodeURIComponent(entry.key)}`
               return (
                 <Link key={entry.key} href={href} className="species-grid-card">
@@ -290,11 +278,11 @@ export default function SpeciesPage() {
                         display: 'inline-flex', alignItems: 'center',
                         padding: '3px 9px', borderRadius: 'var(--r-full)',
                         fontSize: 10, fontWeight: 700,
-                        background: isUnidentified ? 'rgba(180,100,40,0.7)' : 'rgba(0,0,0,0.42)',
+                        background: 'rgba(0,0,0,0.42)',
                         color: 'rgba(255,255,255,0.9)',
                         backdropFilter: 'blur(8px)',
                       }}>
-                        {isUnidentified ? '未同定' : entry.groupName}
+                        {entry.groupName ?? '−'}
                       </span>
                     </div>
                   </div>
