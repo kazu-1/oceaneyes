@@ -18,7 +18,7 @@ export function Photo({ src, alt = '', className = '', fill, sizes, priority, as
         <Image
           src={src}
           alt={alt}
-          fill={fill}
+          fill
           sizes={sizes ?? '(max-width: 440px) 100vw, 440px'}
           className="object-cover"
           priority={priority}
