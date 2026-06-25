@@ -69,21 +69,31 @@ export default async function HomePage() {
 
       {/* ── Hero ── */}
       <section className="hero-section">
-        {/* Decorative ring */}
+        {/* Background photo */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/nishiizu-hero.jpg"
+          alt=""
+          style={{
+            position: 'absolute', inset: 0,
+            width: '100%', height: '100%',
+            objectFit: 'cover', objectPosition: 'center 55%',
+            zIndex: 0,
+          }}
+        />
+        {/* Dark gradient overlay */}
         <div style={{
-          position: 'absolute', right: -60, top: -60,
-          width: 280, height: 280, borderRadius: '50%',
-          border: '1px solid rgba(80,160,200,0.12)',
-          pointerEvents: 'none',
+          position: 'absolute', inset: 0, zIndex: 1,
+          background: 'linear-gradient(170deg, rgba(4,14,28,0.72) 0%, rgba(4,14,26,0.82) 55%, rgba(4,14,26,0.92) 100%)',
         }} />
+        {/* Coral accent glow */}
         <div style={{
-          position: 'absolute', right: -20, top: -20,
-          width: 160, height: 160, borderRadius: '50%',
-          border: '1px solid rgba(80,160,200,0.08)',
+          position: 'absolute', inset: 0, zIndex: 2,
+          background: 'radial-gradient(ellipse at 10% 90%, rgba(232,113,74,0.18) 0%, transparent 50%)',
           pointerEvents: 'none',
         }} />
 
-        <div style={{ position: 'relative', zIndex: 1 }}>
+        <div style={{ position: 'relative', zIndex: 3 }}>
           <p style={{
             fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600,
             color: 'var(--ink-300)', letterSpacing: '0.16em', marginBottom: 16,
@@ -141,7 +151,33 @@ export default async function HomePage() {
 
       {/* ── HOW IT WORKS — horizontal scroll cards ── */}
       <section style={{ background: 'var(--bg-card)', borderBottom: '1px solid var(--border-light)', paddingBottom: 24 }}>
-        <div style={{ padding: '28px 20px 0' }}>
+
+        {/* Photo strip */}
+        <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/nishiizu-hero.jpg"
+            alt="西伊豆の海"
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 68%' }}
+          />
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.48) 100%)',
+          }} />
+          <div style={{ position: 'absolute', bottom: 16, left: 20, right: 20 }}>
+            <p style={{
+              fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600,
+              color: 'rgba(255,255,255,0.7)', letterSpacing: '0.14em', marginBottom: 4,
+            }}>
+              NISHIIZU, SHIZUOKA
+            </p>
+            <p style={{ fontSize: 15, fontWeight: 900, color: '#fff', letterSpacing: '-0.02em', textShadow: '0 1px 8px rgba(0,0,0,0.4)' }}>
+              透明度抜群の海で、生き物に出会う。
+            </p>
+          </div>
+        </div>
+
+        <div style={{ padding: '24px 20px 0' }}>
           <p style={{ fontFamily: 'var(--font-mono)', fontSize: 10, fontWeight: 600, color: 'var(--ink-500)', letterSpacing: '0.14em', marginBottom: 4 }}>
             HOW IT WORKS
           </p>

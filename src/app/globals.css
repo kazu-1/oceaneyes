@@ -597,11 +597,7 @@ button { font-family: inherit; }
    ================================================================ */
 
 .hero-section {
-  background: var(--ink-900);
-  background-image:
-    radial-gradient(ellipse at 80% 10%, rgba(45, 122, 158, 0.35) 0%, transparent 55%),
-    radial-gradient(ellipse at 10% 90%, rgba(232, 113, 74, 0.18) 0%, transparent 50%),
-    linear-gradient(175deg, var(--ink-800) 0%, var(--ink-950) 100%);
+  background: var(--ink-950);
   color: #fff;
   padding: 40px 24px 44px;
   position: relative;
