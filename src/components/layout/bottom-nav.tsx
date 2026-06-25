@@ -8,8 +8,8 @@ const LEFT_ITEMS  = [
   { href: '/species', label: '図鑑',   icon: BookIcon  },
 ]
 const RIGHT_ITEMS = [
-  { href: '/gallery', label: '記録',   icon: GridIcon  },
   { href: '/areas',   label: 'エリア', icon: PinIcon   },
+  { href: '/mypage',  label: 'マイページ', icon: UserIcon },
 ]
 
 export function BottomNav() {
@@ -63,13 +63,11 @@ function BookIcon({ active }: { active: boolean }) {
   )
 }
 
-function GridIcon({ active }: { active: boolean }) {
+function UserIcon({ active }: { active: boolean }) {
   return (
     <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={active ? 2.2 : 1.7} strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3"   width="7" height="7" rx="1.5" fill={active ? 'currentColor' : 'none'} fillOpacity={0.2} />
-      <rect x="14" y="3"  width="7" height="7" rx="1.5" fill={active ? 'currentColor' : 'none'} fillOpacity={0.2} />
-      <rect x="14" y="14" width="7" height="7" rx="1.5" fill={active ? 'currentColor' : 'none'} fillOpacity={0.2} />
-      <rect x="3" y="14"  width="7" height="7" rx="1.5" fill={active ? 'currentColor' : 'none'} fillOpacity={0.2} />
+      <circle cx="12" cy="8" r="4" fill={active ? 'currentColor' : 'none'} fillOpacity={0.16} />
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
     </svg>
   )
 }

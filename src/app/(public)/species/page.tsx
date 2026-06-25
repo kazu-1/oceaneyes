@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
-import type { Group } from '@/types/database'
+import type { Group, Area } from '@/types/database'
 import type { ObsMarker } from '@/components/map/species-map'
 
 const SpeciesMap = dynamic(
@@ -39,6 +39,7 @@ type RawObs = {
   species_id: string | null
   photo_url: string | null
   map_coords: { lat: number; lng: number } | null
+  area_id: string | null
   taxon: {
     id: string
     name_ja: string
@@ -54,7 +55,9 @@ export default function SpeciesPage() {
   const [entries, setEntries]             = useState<SpeciesEntry[]>([])
   const [rawObs, setRawObs]               = useState<RawObs[]>([])
   const [groups, setGroups]               = useState<Group[]>([])
+  const [areas, setAreas]                 = useState<Area[]>([])
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null)
+  const [selectedArea, setSelectedArea]   = useState<string | null>(null)
   const [search, setSearch]               = useState('')
   const [loading, setLoading]             = useState(true)
   const [view, setView]                   = useState<'list' | 'map'>('list')
@@ -62,10 +65,11 @@ export default function SpeciesPage() {
   useEffect(() => {
     const supabase = createClient()
     supabase.from('groups').select('*').order('sort_order').then(({ data }) => setGroups(data ?? []))
+    supabase.from('areas').select('*').order('name').then(({ data }) => setAreas(data ?? []))
 
     supabase
       .from('observations')
-      .select('species_name_raw, species_id, photo_url, map_coords, taxon:taxa(id, name_ja, name_scientific, group_id, group:groups(id, name))')
+      .select('species_name_raw, species_id, photo_url, map_coords, area_id, taxon:taxa(id, name_ja, name_scientific, group_id, group:groups(id, name))')
       .eq('is_public', true)
       .then(({ data }) => {
         const obs = (data ?? []) as unknown as RawObs[]
@@ -98,9 +102,18 @@ export default function SpeciesPage() {
       })
   }, [])
 
+  // Keys of species that appear in the selected area
+  const areaSpeciesKeys = useMemo(() => {
+    if (!selectedArea) return null
+    const keys = new Set<string>()
+    rawObs.filter(o => o.area_id === selectedArea && o.species_name_raw).forEach(o => keys.add(o.species_name_raw!))
+    return keys
+  }, [rawObs, selectedArea])
+
   const filtered = useMemo(() => {
     let result = entries
-    if (selectedGroup) result = result.filter(e => e.groupId === selectedGroup)
+    if (areaSpeciesKeys) result = result.filter(e => areaSpeciesKeys.has(e.key))
+    if (selectedGroup)   result = result.filter(e => e.groupId === selectedGroup)
     if (search.trim()) {
       const s = search.toLowerCase()
       result = result.filter(e =>
@@ -109,7 +122,7 @@ export default function SpeciesPage() {
       )
     }
     return result
-  }, [entries, selectedGroup, search])
+  }, [entries, areaSpeciesKeys, selectedGroup, search])
 
   // Build map markers filtered by current search / group
   const mapMarkers = useMemo<ObsMarker[]>(() => {
@@ -177,11 +190,23 @@ export default function SpeciesPage() {
         </div>
       </div>
 
+      {/* ── Area filter chips ── */}
+      {areas.length > 0 && (
+        <div className="chips-row" style={{ background: 'var(--bg-card)', paddingTop: 8, paddingBottom: 8, borderBottom: '1px solid var(--border-light)' }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--fg-4)', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', flexShrink: 0, alignSelf: 'center' }}>AREA</span>
+          <button className={`chip ${!selectedArea ? 'active' : ''}`} onClick={() => setSelectedArea(null)}>すべて</button>
+          {areas.map(a => (
+            <button key={a.id} className={`chip ${selectedArea === a.id ? 'active' : ''}`} onClick={() => setSelectedArea(a.id)}>
+              {a.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* ── Group filter chips ── */}
-      <div className="chips-row" style={{ background: 'var(--bg-card)', paddingTop: 10, paddingBottom: 10, borderBottom: '1px solid var(--border-light)' }}>
-        <button className={`chip ${!selectedGroup ? 'active' : ''}`} onClick={() => setSelectedGroup(null)}>
-          すべて
-        </button>
+      <div className="chips-row" style={{ background: 'var(--bg-card)', paddingTop: 8, paddingBottom: 8, borderBottom: '1px solid var(--border-light)' }}>
+        <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--fg-4)', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', flexShrink: 0, alignSelf: 'center' }}>種類</span>
+        <button className={`chip ${!selectedGroup ? 'active' : ''}`} onClick={() => setSelectedGroup(null)}>すべて</button>
         {groups.map(g => (
           <button key={g.id} className={`chip ${selectedGroup === g.id ? 'active' : ''}`} onClick={() => setSelectedGroup(g.id)}>
             {g.name}
