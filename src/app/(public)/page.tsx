@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ObsGridCard } from '@/components/observation/obs-grid-card'
-import type { ObservationWithRelations, Area, Taxon, Shop } from '@/types/database'
+import type { ObservationWithRelations, Taxon, Shop } from '@/types/database'
 
 async function getHomeData() {
   const supabase = await createClient()
 
-  const [{ data: { user } }, obsRes, areasRes, taxaRes, shopsRes, statsRes] = await Promise.all([
+  const [{ data: { user } }, obsRes, taxaRes, shopsRes, statsRes] = await Promise.all([
     supabase.auth.getUser(),
     supabase
       .from('observations')
@@ -14,7 +14,6 @@ async function getHomeData() {
       .eq('is_public', true)
       .order('created_at', { ascending: false })
       .limit(8),
-    supabase.from('areas').select('*').order('name'),
     supabase.from('taxa').select('*, group:groups(name)').order('record_count', { ascending: false }).limit(8),
     supabase.from('shops').select('*, area:areas(name)').limit(8),
     supabase.from('observations').select('id, species_id', { count: 'exact', head: false }).eq('is_public', true),
@@ -27,7 +26,6 @@ async function getHomeData() {
   return {
     user,
     observations: (obsRes.data ?? []) as ObservationWithRelations[],
-    areas:        (areasRes.data ?? []) as Area[],
     taxa:         (taxaRes.data ?? []) as (Taxon & { group?: { name: string } | null })[],
     shops:        (shopsRes.data ?? []) as (Shop & { area?: { name: string } | null })[],
     totalPosts,
@@ -36,14 +34,7 @@ async function getHomeData() {
 }
 
 export default async function HomePage() {
-  const { user, observations, areas, taxa, shops, totalPosts, totalSpecies } = await getHomeData()
-
-  const areaGradients = [
-    { from: '#0d3a5a', to: '#1a6a8e', accent: '#4db8d8' },
-    { from: '#6a2810', to: '#c05830', accent: '#f08050' },
-    { from: '#0a4030', to: '#1a7858', accent: '#40c090' },
-    { from: '#3a1a5a', to: '#6a3898', accent: '#a870e0' },
-  ]
+  const { user, observations, taxa, shops, totalPosts, totalSpecies } = await getHomeData()
 
   return (
     <div>
@@ -274,64 +265,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── エリアから探す ── */}
-      {areas.length > 0 && (
-        <section style={{ paddingBottom: 20 }}>
-          <div className="section-header">
-            <div>
-              <p className="section-label">DIVE AREAS</p>
-              <span className="section-title">エリアから探す</span>
-            </div>
-            <Link href="/areas" className="section-link">
-              すべて <ChevronRight />
-            </Link>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, padding: '0 16px' }}>
-            {areas.slice(0, 4).map((area, i) => {
-              const g = areaGradients[i % areaGradients.length]
-              return (
-                <Link
-                  key={area.id}
-                  href={`/gallery?area=${area.id}`}
-                  className="card card-interactive"
-                  style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px' }}
-                >
-                  {/* Icon */}
-                  <div style={{
-                    width: 46, height: 46, borderRadius: 'var(--r-md)', flexShrink: 0,
-                    background: `linear-gradient(145deg, ${g.from} 0%, ${g.to} 100%)`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    boxShadow: `0 4px 12px ${g.from}60`,
-                  }}>
-                    <svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={g.accent} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-                      <circle cx="12" cy="10" r="3" />
-                    </svg>
-                  </div>
-
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: 15, fontWeight: 800, color: 'var(--fg)', letterSpacing: '-0.02em', marginBottom: 3 }}>{area.name}</p>
-                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                      {area.name_en && (
-                        <span style={{ fontFamily: 'var(--font-mono)', fontSize: 9, color: 'var(--fg-4)', letterSpacing: '0.1em' }}>{area.name_en.toUpperCase()}</span>
-                      )}
-                      <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--ink-600)', fontSize: 12 }}>{area.species_count}</span> 種
-                      </span>
-                      <span style={{ fontSize: 11, color: 'var(--fg-3)' }}>
-                        <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--ink-600)', fontSize: 12 }}>{area.post_count}</span> 件
-                      </span>
-                    </div>
-                  </div>
-
-                  <ChevronRight />
-                </Link>
-              )
-            })}
-          </div>
-        </section>
-      )}
 
       {/* ── 最新の投稿 ── */}
       <section style={{ background: 'var(--bg-card)', borderTop: '1px solid var(--border-light)', paddingBottom: 20 }}>
